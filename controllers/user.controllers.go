@@ -1,7 +1,9 @@
 package controllers
 
 import (
+	"backend-majoo-test/models"
 	"backend-majoo-test/services"
+	"encoding/json"
 	"net/http"
 	"strconv"
 
@@ -22,8 +24,26 @@ func NewUserController(userService services.UserService) UserController {
 func (c *UserController) Route(route *mux.Router) {
 	subRouter := route.PathPrefix("/user").Subrouter()
 
+	subRouter.HandleFunc("/", c.createUser).Methods("POST")
 	subRouter.HandleFunc("/{id}", c.findUserByID).Methods("GET")
 	subRouter.HandleFunc("/", c.findAllUser).Methods("GET")
+}
+
+func (c *UserController) createUser(w http.ResponseWriter, r *http.Request) {
+	var request models.CreateUserRequest
+
+	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
+		ResponseWithError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	result, err := c.UserService.CreateNewUser(request)
+	if err != nil {
+		ResponseWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	ResponseWithJSON(w, http.StatusCreated, result)
 }
 
 func (c *UserController) findUserByID(w http.ResponseWriter, r *http.Request) {
