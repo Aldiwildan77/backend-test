@@ -14,6 +14,22 @@ func NewUserService(userRepo repositories.UserRepository) UserService {
 	return &userServiceImpl{userRepo}
 }
 
+func (ur *userServiceImpl) FindUserByID(id int) (*models.ReadUserResponse, error) {
+	result, err := ur.UserRepo.FindByID(id)
+	if err != nil {
+		return nil, err
+	}
+
+	response := models.ReadUserResponse{
+		ID:       result.ID,
+		FullName: result.FullName,
+		Username: result.Username,
+		Photo:    result.Photo,
+	}
+
+	return &response, nil
+}
+
 func (ur *userServiceImpl) FindAllUser() (*[]models.ReadUserResponse, error) {
 	result, err := ur.UserRepo.FindAll()
 	if err != nil {

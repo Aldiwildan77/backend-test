@@ -15,6 +15,16 @@ func NewUserRepository(DB *gorm.DB) UserRepository {
 	return &userRepositoryImpl{DB}
 }
 
+func (r *userRepositoryImpl) FindByID(id int) (*entities.User, error) {
+	var user entities.User
+
+	if err := r.DB.First(&user, id).Error; err != nil {
+		return nil, err
+	}
+
+	return &user, nil
+}
+
 func (r *userRepositoryImpl) FindAll() (*[]entities.User, error) {
 	var users []entities.User
 
