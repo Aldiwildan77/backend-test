@@ -23,6 +23,8 @@ func main() {
 
 	log.Printf("Database is running: %v", db.ConnPool)
 
+	connection.Seed(db)
+
 	// setup router
 	router := mux.NewRouter()
 	router.HandleFunc("/", index)
