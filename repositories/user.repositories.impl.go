@@ -43,6 +43,16 @@ func (r *userRepositoryImpl) FindAll() (*[]entities.User, error) {
 	return &users, nil
 }
 
+func (r *userRepositoryImpl) FindUserCredentials(username string, password string) (*entities.User, error) {
+	var user entities.User
+
+	if err := r.DB.Where("username = ? AND password = ?", username, password).First(&user).Error; err != nil {
+		return nil, err
+	}
+
+	return &user, nil
+}
+
 func (r *userRepositoryImpl) Update(id int, userRequest entities.User) (*entities.User, error) {
 	var user entities.User
 

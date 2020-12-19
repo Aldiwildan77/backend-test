@@ -38,6 +38,11 @@ func main() {
 	userController := controllers.NewUserController(userService)
 	userController.Route(router)
 
+	// Setup Auth Modules
+	authService := services.NewAuthService(userRepository)
+	authController := controllers.NewAuthController(authService)
+	authController.Route(router)
+
 	// run server
 	if err := http.ListenAndServe(":8009", router); err != nil {
 		panic(err)
