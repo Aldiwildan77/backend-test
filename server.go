@@ -2,6 +2,9 @@ package main
 
 import (
 	"backend-majoo-test/connection"
+	"backend-majoo-test/controllers"
+	"backend-majoo-test/repositories"
+	"backend-majoo-test/services"
 	"log"
 	"net/http"
 
@@ -28,6 +31,12 @@ func main() {
 	// setup router
 	router := mux.NewRouter()
 	router.HandleFunc("/", index)
+
+	// Setup User Modules
+	userRepository := repositories.NewUserRepository(db)
+	userService := services.NewUserService(userRepository)
+	userController := controllers.NewUserController(userService)
+	userController.Route(router)
 
 	// run server
 	if err := http.ListenAndServe(":8009", router); err != nil {
