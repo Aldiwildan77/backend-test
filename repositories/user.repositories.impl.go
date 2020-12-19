@@ -42,3 +42,20 @@ func (r *userRepositoryImpl) FindAll() (*[]entities.User, error) {
 
 	return &users, nil
 }
+
+func (r *userRepositoryImpl) Update(id int, userRequest entities.User) (*entities.User, error) {
+	var user entities.User
+
+	if err := r.DB.Find(&user, id).Error; err != nil {
+		return nil, err
+	}
+
+	user.Password = userRequest.Password
+	user.FullName = userRequest.FullName
+
+	if err := r.DB.Save(&user).Error; err != nil {
+		return nil, err
+	}
+
+	return &user, nil
+}
