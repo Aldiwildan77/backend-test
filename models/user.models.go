@@ -3,7 +3,7 @@ package models
 // CreateUserRequest model
 type CreateUserRequest struct {
 	Username string `json:"username"`
-	Password string `json:"-"`
+	Password string `json:"password"`
 	FullName string `json:"fullname"`
 }
 
