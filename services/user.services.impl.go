@@ -105,6 +105,26 @@ func (ur *userServiceImpl) DeleteUserByID(id int) error {
 	return ur.UserRepo.Delete(int(user.ID))
 }
 
+func (ur *userServiceImpl) UploadPhoto(id int, location string) (*models.UpdateUserResponse, error) {
+	if err := ur.UserRepo.UpdatePhoto(id, location); err != nil {
+		return nil, err
+	}
+
+	result, err := ur.UserRepo.FindByID(id)
+	if err != nil {
+		return nil, err
+	}
+
+	response := models.UpdateUserResponse{
+		ID:       result.ID,
+		FullName: result.FullName,
+		Username: result.Username,
+		Photo:    result.Photo,
+	}
+
+	return &response, nil
+}
+
 func prepareUpdate(user *entities.User, request models.UpdateUserRequest) entities.User {
 	if request.FullName != "" {
 		user.FullName = request.FullName

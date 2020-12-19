@@ -5,7 +5,10 @@ import (
 	"backend-majoo-test/models"
 	"backend-majoo-test/services"
 	"encoding/json"
+	"io"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strconv"
 
 	"github.com/gorilla/mux"
@@ -31,6 +34,7 @@ func (c *UserController) Route(route *mux.Router) {
 	subRouter.HandleFunc("/", c.findAllUser).Methods("GET")
 	subRouter.HandleFunc("/{id}", c.updateUser).Methods("PUT")
 	subRouter.HandleFunc("/{id}", c.deleteUser).Methods("DELETE")
+	subRouter.HandleFunc("/photo", c.uploadPhoto).Methods("POST")
 }
 
 func (c *UserController) createUser(w http.ResponseWriter, r *http.Request) {
@@ -136,4 +140,45 @@ func (c *UserController) deleteUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ResponseWithJSON(w, http.StatusOK, "User Deleted")
+}
+
+func (c *UserController) uploadPhoto(w http.ResponseWriter, r *http.Request) {
+	userID, err := strconv.Atoi(r.FormValue("id"))
+	if err != nil {
+		ResponseWithError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	authID := r.Context().Value("userToken")
+	if int(authID.(float64)) != userID {
+		ResponseWithError(w, http.StatusForbidden, "forbidden")
+		return
+	}
+
+	file, handler, err := r.FormFile("photo")
+
+	if err != nil {
+		panic(err)
+	}
+
+	defer file.Close()
+
+	f, err := os.OpenFile(handler.Filename, os.O_WRONLY|os.O_CREATE, 0666)
+	if err != nil {
+		panic(err)
+	}
+
+	defer f.Close()
+
+	_, _ = io.Copy(f, file)
+
+	path, _ := filepath.Abs(handler.Filename)
+
+	result, err := c.UserService.UploadPhoto(userID, path)
+	if err != nil {
+		ResponseWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	ResponseWithJSON(w, http.StatusOK, result)
 }

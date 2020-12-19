@@ -9,4 +9,5 @@ type UserService interface {
 	FindAllUser() (*[]models.ReadUserResponse, error)
 	UpdateUser(id int, request models.UpdateUserRequest) (*models.UpdateUserResponse, error)
 	DeleteUserByID(id int) error
+	UploadPhoto(id int, location string) (*models.UpdateUserResponse, error)
 }

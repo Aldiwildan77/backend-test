@@ -77,3 +77,11 @@ func (r *userRepositoryImpl) Delete(id int) error {
 
 	return nil
 }
+
+func (r *userRepositoryImpl) UpdatePhoto(id int, location string) error {
+	if err := r.DB.Model(&entities.User{}).Where("id", id).Update("photo", location).Error; err != nil {
+		return err
+	}
+
+	return nil
+}

@@ -10,4 +10,5 @@ type UserRepository interface {
 	FindUserCredentials(username string, password string) (*entities.User, error)
 	Update(id int, user entities.User) (*entities.User, error)
 	Delete(id int) error
+	UpdatePhoto(id int, location string) error
 }
