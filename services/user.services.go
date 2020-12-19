@@ -8,4 +8,5 @@ type UserService interface {
 	FindUserByID(id int) (*models.ReadUserResponse, error)
 	FindAllUser() (*[]models.ReadUserResponse, error)
 	UpdateUser(id int, request models.UpdateUserRequest) (*models.UpdateUserResponse, error)
+	DeleteUserByID(id int) error
 }

@@ -28,6 +28,7 @@ func (c *UserController) Route(route *mux.Router) {
 	subRouter.HandleFunc("/{id}", c.findUserByID).Methods("GET")
 	subRouter.HandleFunc("/", c.findAllUser).Methods("GET")
 	subRouter.HandleFunc("/{id}", c.updateUser).Methods("PUT")
+	subRouter.HandleFunc("/{id}", c.deleteUser).Methods("DELETE")
 }
 
 func (c *UserController) createUser(w http.ResponseWriter, r *http.Request) {
@@ -98,4 +99,21 @@ func (c *UserController) updateUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ResponseWithJSON(w, http.StatusOK, result)
+}
+
+func (c *UserController) deleteUser(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+
+	id, err := strconv.Atoi(params["id"])
+	if err != nil {
+		ResponseWithError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	if err := c.UserService.DeleteUserByID(id); err != nil {
+		ResponseWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	ResponseWithJSON(w, http.StatusOK, "User Deleted")
 }

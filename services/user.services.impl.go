@@ -96,6 +96,15 @@ func (ur *userServiceImpl) UpdateUser(id int, request models.UpdateUserRequest) 
 	return &response, nil
 }
 
+func (ur *userServiceImpl) DeleteUserByID(id int) error {
+	user, err := ur.UserRepo.FindByID(id)
+	if err != nil {
+		return err
+	}
+
+	return ur.UserRepo.Delete(int(user.ID))
+}
+
 func prepareUpdate(user *entities.User, request models.UpdateUserRequest) entities.User {
 	if request.FullName != "" {
 		user.FullName = request.FullName

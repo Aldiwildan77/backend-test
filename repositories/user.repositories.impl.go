@@ -59,3 +59,11 @@ func (r *userRepositoryImpl) Update(id int, userRequest entities.User) (*entitie
 
 	return &user, nil
 }
+
+func (r *userRepositoryImpl) Delete(id int) error {
+	if err := r.DB.Delete(&entities.User{}, id).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
