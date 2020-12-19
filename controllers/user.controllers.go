@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"backend-majoo-test/middlewares"
 	"backend-majoo-test/models"
 	"backend-majoo-test/services"
 	"encoding/json"
@@ -24,6 +25,7 @@ func NewUserController(userService services.UserService) UserController {
 func (c *UserController) Route(route *mux.Router) {
 	subRouter := route.PathPrefix("/user").Subrouter()
 
+	subRouter.Use(middlewares.JwtVerify)
 	subRouter.HandleFunc("/", c.createUser).Methods("POST")
 	subRouter.HandleFunc("/{id}", c.findUserByID).Methods("GET")
 	subRouter.HandleFunc("/", c.findAllUser).Methods("GET")
@@ -57,6 +59,12 @@ func (c *UserController) findUserByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	authID := r.Context().Value("userToken")
+	if int(authID.(float64)) != id {
+		ResponseWithError(w, http.StatusForbidden, "forbidden")
+		return
+	}
+
 	result, err := c.UserService.FindUserByID(id)
 	if err != nil {
 		ResponseWithError(w, http.StatusInternalServerError, err.Error())
@@ -87,6 +95,12 @@ func (c *UserController) updateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	authID := r.Context().Value("userToken")
+	if int(authID.(float64)) != id {
+		ResponseWithError(w, http.StatusForbidden, "forbidden")
+		return
+	}
+
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 		ResponseWithError(w, http.StatusBadRequest, err.Error())
 		return
@@ -107,6 +121,12 @@ func (c *UserController) deleteUser(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(params["id"])
 	if err != nil {
 		ResponseWithError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	authID := r.Context().Value("userToken")
+	if int(authID.(float64)) != id {
+		ResponseWithError(w, http.StatusForbidden, "forbidden")
 		return
 	}
 
