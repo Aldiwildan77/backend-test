@@ -27,14 +27,16 @@ func NewUserController(userService services.UserService) UserController {
 // Route entry
 func (c *UserController) Route(route *mux.Router) {
 	subRouter := route.PathPrefix("/user").Subrouter()
+	subProtectedRouter := route.PathPrefix("/user").Subrouter()
 
-	subRouter.Use(middlewares.JwtVerify)
 	subRouter.HandleFunc("/", c.createUser).Methods("POST")
-	subRouter.HandleFunc("/{id}", c.findUserByID).Methods("GET")
 	subRouter.HandleFunc("/", c.findAllUser).Methods("GET")
-	subRouter.HandleFunc("/{id}", c.updateUser).Methods("PUT")
-	subRouter.HandleFunc("/{id}", c.deleteUser).Methods("DELETE")
-	subRouter.HandleFunc("/photo", c.uploadPhoto).Methods("POST")
+
+	subProtectedRouter.Use(middlewares.JwtVerify)
+	subProtectedRouter.HandleFunc("/{id}", c.findUserByID).Methods("GET")
+	subProtectedRouter.HandleFunc("/{id}", c.updateUser).Methods("PUT")
+	subProtectedRouter.HandleFunc("/{id}", c.deleteUser).Methods("DELETE")
+	subProtectedRouter.HandleFunc("/photo", c.uploadPhoto).Methods("POST")
 }
 
 func (c *UserController) createUser(w http.ResponseWriter, r *http.Request) {
